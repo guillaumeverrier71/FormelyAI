@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FormelyAI – Fiches intelligentes</title>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FormelyAI" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+<!-- ── NAVBAR ── -->
+<nav class="sticky top-0 z-40 w-full bg-slate-900 border-b border-slate-800">
+  <div class="px-5 flex items-center h-14 gap-4">
+    <a href="#" class="flex items-center gap-2.5 group">
+      <div class="w-7 h-7 rounded-lg bg-violet-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+        <i class="bi bi-stars text-white text-sm"></i>
+      </div>
+      <span class="text-white font-bold text-lg tracking-tight">Formerly<span class="text-violet-400">AI</span></span>
+    </a>
+    <span class="text-slate-500 text-sm hidden md:inline ml-1">· Transforme tes cours en fiches intelligentes</span>
+    <div class="ml-auto flex items-center gap-2">
+      <!-- Shown when logged in -->
+      <div id="navUser" class="hidden items-center gap-2">
+        <span id="navUsageBadge" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full font-medium"></span>
+        <span id="navPlanBadge" class="hidden bg-violet-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">Premium</span>
+        <button onclick="showUpgrade()" id="navUpgradeBtn" class="hidden bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-2.5 py-1 rounded-lg transition">
+          <i class="bi bi-stars mr-1"></i>Premium
+        </button>
+        <button onclick="showUpload()" class="text-slate-400 hover:text-white text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-800 transition">
+          <i class="bi bi-plus-lg"></i><span class="hidden sm:inline">Nouveau</span>
+        </button>
+        <button onclick="logout()" title="Se déconnecter" class="text-slate-400 hover:text-white px-2 py-1.5 rounded-lg hover:bg-slate-800 transition">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+      <!-- Shown when logged out -->
+      <div id="navAuth" class="hidden items-center gap-2">
+        <button onclick="showAuthModal('login')" class="text-slate-300 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-slate-700 transition">
+          Se connecter
+        </button>
+        <button onclick="showAuthModal('register')" class="bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition">
+          S'inscrire
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── LAYOUT ── -->
+<div class="flex min-h-[calc(100vh-3.5rem)]">
+
+  <!-- SIDEBAR -->
+  <aside class="hidden lg:flex flex-col w-60 bg-white border-r border-slate-200 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto shrink-0">
+    <div class="p-4 border-b border-slate-100">
+      <div class="flex justify-between items-center">
+        <span class="text-slate-400 font-semibold text-xs uppercase tracking-wider">Historique</span>
+        <button onclick="loadSessions()" class="text-slate-400 hover:text-violet-600 p-1 rounded-md hover:bg-violet-50 transition text-sm">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+    <div id="sessionList" class="flex flex-col gap-1 p-2">
+      <p class="text-slate-400 text-xs text-center mt-6">Aucune session</p>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full">
+
+    <!-- ── UPLOAD ── -->
+    <section id="uploadSection">
+      <div class="max-w-xl mx-auto">
+
+        <div class="text-center mb-8 mt-4">
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-violet-100 mb-4">
+            <i class="bi bi-stars text-violet-600 text-2xl"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-slate-900 mb-1">Génère tes fiches en 1 clic</h1>
+          <p class="text-slate-500 text-sm">Dépose ton cours, l'IA s'occupe du reste.</p>
+        </div>
+
+        <!-- Usage counter -->
+        <div id="usageBar" class="hidden mb-4 bg-white rounded-xl border border-slate-200 px-4 py-3 flex items-center justify-between gap-3">
+          <div class="text-sm text-slate-600">
+            <span id="usageText" class="font-semibold text-slate-800"></span>
+          </div>
+          <button onclick="showUpgrade()" id="usageUpgradeBtn" class="hidden text-xs font-semibold text-violet-600 hover:text-violet-700 transition flex items-center gap-1">
+            <i class="bi bi-stars"></i>Passer Premium
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-6">
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Matière</label>
+              <input type="text" id="subjectInput"
+                class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent placeholder-slate-400 transition"
+                placeholder="ex. Thermodynamique, Histoire, Droit…" />
+            </div>
+
+            <!-- Drop zone -->
+            <div id="dropZone" class="drop-zone mb-3" onclick="document.getElementById('fileInput').click()">
+              <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center mx-auto mb-3">
+                <i class="bi bi-file-earmark-pdf-fill text-violet-600 text-lg"></i>
+              </div>
+              <p class="font-semibold text-sm text-slate-700 mb-1">Glisse ton PDF ici</p>
+              <p class="text-slate-400 text-xs">ou clique pour sélectionner</p>
+              <input type="file" id="fileInput" accept=".pdf" class="hidden" />
+            </div>
+            <div id="fileChosen" class="text-green-600 text-sm mb-3 hidden items-center gap-1.5">
+              <i class="bi bi-check-circle-fill"></i><span id="fileChosenName"></span>
+            </div>
+
+            <div class="or-divider"><span>ou</span></div>
+
+            <div class="mb-5">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Colle ton texte</label>
+              <textarea id="textInput"
+                class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent placeholder-slate-400 font-mono resize-none"
+                rows="5"
+                placeholder="Colle ici le contenu de ton cours…"></textarea>
+            </div>
+
+            <button id="generateBtn" onclick="handleUpload()"
+              class="w-full bg-violet-600 hover:bg-violet-700 active:scale-[.98] text-white font-semibold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-violet-500/20">
+              <i class="bi bi-stars"></i>Générer les fiches avec l'IA
+            </button>
+
+            <div class="or-divider mt-4"><span>ou</span></div>
+
+            <button onclick="showManual()"
+              class="w-full border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
+              <i class="bi bi-pencil-square"></i>Créer manuellement (gratuit)
+            </button>
+
+          </div>
+        </div>
+
+        <!-- History on mobile -->
+        <div class="lg:hidden mt-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Historique</span>
+            <button onclick="loadSessions()" class="text-slate-400 hover:text-violet-600 text-sm transition"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+          <div id="sessionListMobile" class="flex flex-col gap-1.5">
+            <p class="text-slate-400 text-xs text-center mt-2">Aucune session</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── LOADING ── -->
+    <section id="loadingSection" class="hidden">
+      <div class="flex flex-col items-center justify-center py-24 gap-5">
+        <div class="spinner-ring"></div>
+        <div class="text-center">
+          <h5 class="font-semibold text-lg text-slate-800">Analyse en cours…</h5>
+          <p class="text-slate-400 text-sm mt-1" id="loadingMsg">L'IA lit ton cours et génère les fiches.</p>
+        </div>
+        <div class="w-48 h-1 bg-slate-200 rounded-full overflow-hidden">
+          <div class="h-full bg-violet-500 rounded-full animate-pulse w-full"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RESULTS ── -->
+    <section id="resultsSection" class="hidden">
+
+      <!-- Header -->
+      <div class="flex flex-wrap justify-between items-start mb-6 gap-3">
+        <div class="min-w-0">
+          <h2 class="font-bold text-xl text-slate-900 truncate" id="resultsTitle">Résultats</h2>
+          <p class="text-slate-400 text-sm mt-0.5" id="resultsSubtitle"></p>
+        </div>
+        <div class="flex gap-2 flex-wrap shrink-0">
+          <button onclick="startPractice()"
+            class="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-3.5 py-2 rounded-xl transition text-sm flex items-center gap-1.5 shadow shadow-violet-500/20">
+            <i class="bi bi-play-fill"></i>Practice
+          </button>
+          <button onclick="openAddQaModal()"
+            class="border border-violet-200 text-violet-600 hover:bg-violet-50 font-medium px-3.5 py-2 rounded-xl transition text-sm flex items-center gap-1.5">
+            <i class="bi bi-plus-lg"></i>Carte
+          </button>
+          <button onclick="exportCSV()"
+            class="border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium px-3.5 py-2 rounded-xl transition text-sm flex items-center gap-1.5">
+            <i class="bi bi-filetype-csv"></i>CSV
+          </button>
+          <button onclick="exportAnki()"
+            class="border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium px-3.5 py-2 rounded-xl transition text-sm flex items-center gap-1.5" title="Export Anki (.apkg) — Premium">
+            <i class="bi bi-box-arrow-up"></i>Anki
+          </button>
+          <button onclick="exportPDF()"
+            class="border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium px-3.5 py-2 rounded-xl transition text-sm flex items-center gap-1.5" title="Export PDF — Premium">
+            <i class="bi bi-file-pdf"></i>PDF
+          </button>
+          <button onclick="showUpload()"
+            class="border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium px-3.5 py-2 rounded-xl transition text-sm flex items-center gap-1.5">
+            <i class="bi bi-plus-lg"></i>Nouveau
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="statsRow"></div>
+
+      <!-- Tabs -->
+      <div class="flex gap-1 mb-5 bg-slate-100 p-1 rounded-xl w-fit">
+        <button id="tabBtnQa" onclick="showTab('qa')"
+          class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition bg-white text-slate-900 shadow-sm">
+          <i class="bi bi-card-text mr-1.5"></i>Q / R
+          <span id="qaTabBadge" class="ml-1.5 bg-violet-100 text-violet-700 text-xs font-bold px-1.5 py-0.5 rounded-full">0</span>
+        </button>
+        <button id="tabBtnSummaries" onclick="showTab('summaries')"
+          class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition text-slate-500 hover:text-slate-700">
+          <i class="bi bi-journal-text mr-1.5"></i>Résumés
+          <span id="summaryTabBadge" class="ml-1.5 bg-slate-200 text-slate-500 text-xs font-bold px-1.5 py-0.5 rounded-full">0</span>
+        </button>
+      </div>
+
+      <!-- Q&A -->
+      <div id="qaTab">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="qaCards"></div>
+      </div>
+
+      <!-- Summaries -->
+      <div id="summariesTab" class="hidden">
+        <div class="flex flex-col gap-2" id="summaryAccordion"></div>
+      </div>
+
+    </section>
+
+    <!-- ── PRACTICE ── -->
+    <section id="practiceSection" class="hidden">
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="font-bold text-xl text-slate-900 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center">
+              <i class="bi bi-play-fill text-violet-600 text-sm"></i>
+            </div>
+            Mode Practice
+          </h2>
+          <p class="text-slate-400 text-sm mt-0.5" id="practiceProgress"></p>
+        </div>
+        <button onclick="closePractice()"
+          class="border border-slate-200 text-slate-500 hover:bg-slate-100 px-3 py-1.5 rounded-xl transition text-sm flex items-center gap-1.5">
+          <i class="bi bi-x-lg"></i>Quitter
+        </button>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="mb-7 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+        <div class="h-full bg-violet-500 rounded-full transition-all duration-500" id="practiceProgressBar" style="width:0%"></div>
+      </div>
+
+      <div id="practiceCardArea" class="flex justify-center"></div>
+
+      <!-- End screen -->
+      <div id="practiceEndScreen" class="hidden text-center py-16">
+        <div class="text-6xl mb-4" id="practiceEndEmoji">🎉</div>
+        <h3 class="font-bold text-2xl text-slate-900 mb-2">Session terminée !</h3>
+        <p class="text-slate-500 mb-8" id="practiceEndStats"></p>
+        <div class="flex gap-3 justify-center flex-wrap">
+          <button onclick="startPractice()"
+            class="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-2.5 rounded-xl transition flex items-center gap-2">
+            <i class="bi bi-arrow-repeat"></i>Recommencer
+          </button>
+          <button onclick="closePractice()"
+            class="border border-slate-200 text-slate-600 hover:bg-slate-100 px-6 py-2.5 rounded-xl transition flex items-center gap-2">
+            <i class="bi bi-grid"></i>Retour aux fiches
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MANUAL MODE ── -->
+    <section id="manualSection" class="hidden">
+      <div class="max-w-xl mx-auto">
+        <div class="flex items-center gap-3 mb-6">
+          <button onclick="showUpload()" class="text-slate-400 hover:text-slate-600 transition">
+            <i class="bi bi-arrow-left text-lg"></i>
+          </button>
+          <div>
+            <h2 class="font-bold text-xl text-slate-900">Création manuelle</h2>
+            <p class="text-slate-400 text-sm">Crée un deck sans IA, 100% gratuit</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 mb-4">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Titre du deck</label>
+            <input type="text" id="manualTitle"
+              class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+              placeholder="ex. Chapitre 3 — Thermodynamique" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Matière</label>
+            <input type="text" id="manualSubject"
+              class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+              placeholder="ex. Physique" />
+          </div>
+          <button onclick="createManualSession()"
+            class="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+            <i class="bi bi-plus-lg"></i>Créer le deck
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="fixed bottom-5 right-5 z-50 flex flex-col gap-2" id="toastContainer"></div>
+
+<!-- ── AUTH MODAL ── -->
+<div id="authModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/95 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7">
+    <!-- Logo -->
+    <div class="text-center mb-6">
+      <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mx-auto mb-3">
+        <i class="bi bi-stars text-violet-600 text-2xl"></i>
+      </div>
+      <h2 class="font-bold text-xl text-slate-900">FormelyAI</h2>
+      <p class="text-slate-400 text-sm mt-1">Fiches intelligentes pour tes cours</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-5 bg-slate-100 p-1 rounded-xl">
+      <button id="authTabLogin" onclick="switchAuthTab('login')"
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition bg-white text-slate-900 shadow-sm">
+        Se connecter
+      </button>
+      <button id="authTabRegister" onclick="switchAuthTab('register')"
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition text-slate-500 hover:text-slate-700">
+        S'inscrire
+      </button>
+    </div>
+
+    <!-- Error -->
+    <div id="authError" class="hidden mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-xl flex items-center gap-2">
+      <i class="bi bi-exclamation-triangle-fill shrink-0"></i>
+      <span id="authErrorText"></span>
+    </div>
+
+    <!-- Form -->
+    <form onsubmit="submitAuth(event)" autocomplete="on">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+        <input type="email" id="authEmail" required autocomplete="email"
+          class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent placeholder-slate-400 transition"
+          placeholder="ton@email.com" />
+      </div>
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Mot de passe</label>
+        <input type="password" id="authPassword" required autocomplete="current-password"
+          class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent placeholder-slate-400 transition"
+          placeholder="••••••" />
+        <p id="authPasswordHint" class="hidden text-slate-400 text-xs mt-1.5">Minimum 6 caractères</p>
+      </div>
+      <button type="submit" id="authSubmitBtn"
+        class="w-full bg-violet-600 hover:bg-violet-700 active:scale-[.98] text-white font-semibold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow shadow-violet-500/20">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span id="authSubmitText">Se connecter</span>
+      </button>
+    </form>
+
+    <p class="text-slate-400 text-xs text-center mt-4">
+      <span id="authSwitchText">Pas encore de compte ?</span>
+      <button onclick="switchAuthTab('register')" id="authSwitchBtn" class="text-violet-600 hover:underline ml-1">S'inscrire</button>
+    </p>
+  </div>
+</div>
+
+<!-- ── PAYWALL MODAL ── -->
+<div id="paywallModal" class="fixed inset-0 z-[90] hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closePaywall()"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-7 z-10">
+    <button onclick="closePaywall()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mx-auto mb-3">
+        <i class="bi bi-stars text-violet-600 text-2xl"></i>
+      </div>
+      <h2 class="font-bold text-xl text-slate-900" id="paywallTitle">Passe à Premium</h2>
+      <p class="text-slate-500 text-sm mt-1" id="paywallSubtitle">Tu as atteint la limite du plan gratuit.</p>
+    </div>
+
+    <!-- Features -->
+    <div class="bg-violet-50 rounded-xl p-4 mb-5">
+      <div class="text-xs font-bold uppercase tracking-wider text-violet-600 mb-3">Inclus dans Premium</div>
+      <ul class="space-y-2 text-sm text-slate-700">
+        <li class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-violet-500"></i>40 uploads PDF par mois</li>
+        <li class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-violet-500"></i>Révision intelligente (spaced repetition)</li>
+        <li class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-violet-500"></i>Export Anki (.apkg)</li>
+        <li class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-violet-500"></i>Export PDF</li>
+        <li class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-violet-500"></i>Suivi de progression</li>
+      </ul>
+    </div>
+
+    <!-- Price -->
+    <div class="text-center mb-4">
+      <span class="text-3xl font-extrabold text-slate-900">3,99 $</span>
+      <span class="text-slate-400 text-sm">/mois</span>
+    </div>
+
+    <button onclick="subscribePremium()"
+      class="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow shadow-violet-500/20 mb-3">
+      <i class="bi bi-stars"></i>S'abonner maintenant
+    </button>
+
+    <button onclick="buyCredits()"
+      class="w-full border border-violet-200 text-violet-600 hover:bg-violet-50 font-medium py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
+      <i class="bi bi-plus-circle"></i>Acheter 5 PDF pour 1 $
+    </button>
+  </div>
+</div>
+
+<!-- ── MODAL Q/R (add / edit) ── -->
+<div id="qaModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeQaModal()"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 z-10">
+    <div class="flex justify-between items-center mb-5">
+      <h3 class="font-bold text-lg text-slate-900" id="qaModalTitle">Ajouter une carte</h3>
+      <button onclick="closeQaModal()" class="text-slate-400 hover:text-slate-600 transition">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-700 mb-1.5">Question</label>
+      <textarea id="qaModalQuestion" rows="3"
+        class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+        placeholder="Ta question…"></textarea>
+    </div>
+    <div class="mb-5">
+      <label class="block text-sm font-medium text-slate-700 mb-1.5">Réponse</label>
+      <textarea id="qaModalAnswer" rows="4"
+        class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+        placeholder="La réponse…"></textarea>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeQaModal()" class="flex-1 border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium py-2.5 rounded-xl transition text-sm">
+        Annuler
+      </button>
+      <button onclick="submitQaModal()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+        Sauvegarder
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONFIRM MODAL ── -->
+<div id="confirmModal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="confirmCancel()"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+        <i class="bi bi-exclamation-triangle-fill text-red-500"></i>
+      </div>
+      <h3 class="font-bold text-base text-slate-900" id="confirmTitle">Confirmer la suppression</h3>
+    </div>
+    <p class="text-slate-500 text-sm mb-5 ml-12" id="confirmMessage">Cette action est irréversible.</p>
+    <div class="flex gap-2">
+      <button onclick="confirmCancel()" class="flex-1 border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium py-2.5 rounded-xl transition text-sm">
+        Annuler
+      </button>
+      <button onclick="confirmOk()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-1.5">
+        <i class="bi bi-trash3"></i>Supprimer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

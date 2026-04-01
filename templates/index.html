@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AnkiAI – Générateur de fiches et Q/R</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+    onload="renderMathInDocument()"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<!-- ─────────────────────────────── NAVBAR ─────────────────────────────── -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: var(--blue);">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold fs-4" href="#">
+      <i class="bi bi-lightning-charge-fill me-2"></i>AnkiAI
+    </a>
+    <span class="text-white-50 small d-none d-md-inline">Transforme tes cours en fiches intelligentes</span>
+  </div>
+</nav>
+
+<!-- ──────────────────────────────── MAIN ───────────────────────────────── -->
+<div class="container-fluid px-0">
+  <div class="row g-0" style="min-height: calc(100vh - 56px);">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="col-12 col-lg-3 col-xl-2 sidebar p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="text-muted fw-semibold mb-0 text-uppercase small letter-spacing">
+          <i class="bi bi-clock-history me-1"></i>Historique
+        </h6>
+        <button class="btn btn-sm btn-outline-secondary" onclick="loadSessions()" title="Rafraîchir">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <div id="sessionList" class="session-list">
+        <p class="text-muted small text-center mt-4">Aucune session</p>
+      </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="col-12 col-lg-9 col-xl-10 p-3 p-md-4">
+
+      <!-- Upload section -->
+      <section id="uploadSection">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-10 col-xl-8">
+            <div class="card shadow-sm border-0 mb-4">
+              <div class="card-body p-4">
+                <h4 class="card-title fw-bold mb-1">
+                  <i class="bi bi-upload me-2 text-primary"></i>Importer un cours
+                </h4>
+                <p class="text-muted small mb-4">Dépose un PDF ou colle ton texte pour générer automatiquement des fiches Q/R et des résumés.</p>
+
+                <!-- Subject -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Matière / Sujet</label>
+                  <input type="text" id="subjectInput" class="form-control" placeholder="ex. Thermodynamique, Histoire, Droit constitutionnel…" />
+                </div>
+
+                <!-- Drop zone -->
+                <div id="dropZone" class="drop-zone mb-3" onclick="document.getElementById('fileInput').click()">
+                  <div class="drop-zone-inner">
+                    <i class="bi bi-file-earmark-pdf-fill drop-icon"></i>
+                    <p class="mb-1 fw-semibold">Glisse ton PDF ici</p>
+                    <p class="text-muted small mb-2">ou clique pour sélectionner un fichier</p>
+                    <span class="badge bg-primary-subtle text-primary">PDF uniquement</span>
+                  </div>
+                  <input type="file" id="fileInput" accept=".pdf" class="d-none" />
+                </div>
+                <div id="fileChosen" class="text-success small mb-2 d-none">
+                  <i class="bi bi-check-circle-fill me-1"></i><span id="fileChosenName"></span>
+                </div>
+
+                <!-- OR divider -->
+                <div class="or-divider my-3"><span>ou</span></div>
+
+                <!-- Text paste -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Colle ton texte</label>
+                  <textarea id="textInput" class="form-control font-mono" rows="6"
+                    placeholder="Colle ici le contenu de ton cours…"></textarea>
+                </div>
+
+                <button id="generateBtn" class="btn btn-primary w-100 py-2 fw-semibold" onclick="handleUpload()">
+                  <i class="bi bi-stars me-2"></i>Générer les fiches
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading -->
+      <section id="loadingSection" class="d-none text-center py-5">
+        <div class="loading-wrapper mx-auto">
+          <div class="spinner-ring"></div>
+          <h5 class="mt-4 fw-semibold">Analyse en cours…</h5>
+          <p class="text-muted" id="loadingMsg">L'IA lit ton cours et génère les fiches.</p>
+          <div class="progress mt-3" style="height:6px; width:240px; margin:0 auto;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width:100%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section id="resultsSection" class="d-none">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+          <div>
+            <h4 class="fw-bold mb-0" id="resultsTitle">Résultats</h4>
+            <small class="text-muted" id="resultsSubtitle"></small>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary btn-sm" onclick="startPractice()">
+              <i class="bi bi-play-fill me-1"></i>Mode Practice
+            </button>
+            <button class="btn btn-outline-success btn-sm" onclick="exportCSV()">
+              <i class="bi bi-download me-1"></i>Exporter CSV
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="showUpload()">
+              <i class="bi bi-plus-lg me-1"></i>Nouveau
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="row g-3 mb-4" id="statsRow"></div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" id="resultTabs">
+          <li class="nav-item">
+            <button class="nav-link active fw-semibold" onclick="showTab('qa')">
+              <i class="bi bi-card-text me-1"></i>Questions / Réponses
+              <span class="badge bg-primary ms-1" id="qaTabBadge">0</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-semibold" onclick="showTab('summaries')">
+              <i class="bi bi-journal-text me-1"></i>Résumés
+              <span class="badge bg-secondary ms-1" id="summaryTabBadge">0</span>
+            </button>
+          </li>
+        </ul>
+
+        <!-- Q&A Tab -->
+        <div id="qaTab">
+          <div class="row g-3" id="qaCards"></div>
+        </div>
+
+        <!-- Summaries Tab -->
+        <div id="summariesTab" class="d-none">
+          <div class="accordion" id="summaryAccordion"></div>
+        </div>
+      </section>
+
+      <!-- Practice Mode -->
+      <section id="practiceSection" class="d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="fw-bold mb-0"><i class="bi bi-play-circle-fill text-primary me-2"></i>Mode Practice</h4>
+            <small class="text-muted" id="practiceProgress"></small>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" onclick="closePractice()">
+            <i class="bi bi-x-lg me-1"></i>Quitter
+          </button>
+        </div>
+
+        <div class="progress mb-4" style="height:8px; border-radius:4px;">
+          <div class="progress-bar bg-primary" id="practiceProgressBar" style="width:0%; transition:width .4s;"></div>
+        </div>
+
+        <div id="practiceCardArea" class="d-flex justify-content-center"></div>
+
+        <div id="practiceEndScreen" class="d-none text-center py-5">
+          <div style="font-size:4rem;" id="practiceEndEmoji">🎉</div>
+          <h3 class="fw-bold mt-2 mb-2">Session terminée !</h3>
+          <p class="text-muted mb-4" id="practiceEndStats"></p>
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <button class="btn btn-primary" onclick="startPractice()">
+              <i class="bi bi-arrow-repeat me-1"></i>Recommencer
+            </button>
+            <button class="btn btn-outline-secondary" onclick="closePractice()">
+              <i class="bi bi-grid me-1"></i>Retour aux fiches
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Si servi par Live Server (port 5500), pointe vers FastAPI (port 8000)
+// Si servi par FastAPI, utilise les URLs relatives
+const API_BASE = window.location.port === "5500" ? "http://localhost:8000" : "";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────────────────────────────────────
+let currentSessionId = null;
+let currentSession   = null;  // full session data for practice mode
+
+// ─────────────────────────────────────────────────────────────────────────────
+// KaTeX auto-render (called when deferred scripts load)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderMathInDocument() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      { left: "$$", right: "$$", display: true },
+      { left: "$",  right: "$",  display: false },
+    ],
+    throwOnError: false,
+    strict: false,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Upload / generate
+// ─────────────────────────────────────────────────────────────────────────────
+const dropZone  = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag-over");
+  const f = e.dataTransfer.files[0];
+  if (f && f.type === "application/pdf") setFile(f);
+  else showToast("Seuls les fichiers PDF sont acceptés.", "danger");
+});
+fileInput.addEventListener("change", () => {
+  if (fileInput.files[0]) setFile(fileInput.files[0]);
+});
+
+function setFile(f) {
+  fileInput._file = f;
+  document.getElementById("fileChosenName").textContent = f.name;
+  document.getElementById("fileChosen").classList.remove("d-none");
+  dropZone.classList.add("file-chosen");
+}
+
+async function handleUpload() {
+  const subject = document.getElementById("subjectInput").value.trim() || "Général";
+  const textVal = document.getElementById("textInput").value.trim();
+  const file    = fileInput._file || fileInput.files[0];
+
+  if (!file && !textVal) {
+    showToast("Dépose un PDF ou colle du texte.", "warning");
+    return;
+  }
+
+  showLoading();
+
+  const fd = new FormData();
+  fd.append("subject", subject);
+  if (file) {
+    fd.append("file", file);
+  } else {
+    fd.append("text", textVal);
+  }
+
+  try {
+    const res  = await fetch(API_BASE + "/upload", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Erreur serveur");
+
+    currentSessionId = data.session_id;
+    await loadAndShowSession(currentSessionId);
+    await loadSessions();
+  } catch (err) {
+    showUpload();
+    showToast("Erreur : " + err.message, "danger");
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Session list
+// ─────────────────────────────────────────────────────────────────────────────
+async function loadSessions() {
+  try {
+    const res      = await fetch(API_BASE + "/sessions");
+    const sessions = await res.json();
+    renderSessionList(sessions);
+  } catch { /* ignore */ }
+}
+
+function renderSessionList(sessions) {
+  const el = document.getElementById("sessionList");
+  if (!sessions.length) {
+    el.innerHTML = '<p class="text-muted small text-center mt-4">Aucune session</p>';
+    return;
+  }
+  el.innerHTML = sessions.map(s => `
+    <div class="session-item ${s.id === currentSessionId ? 'active' : ''}" onclick="loadAndShowSession(${s.id})">
+      <div class="session-item-title">${escHtml(s.title)}</div>
+      <div class="session-item-meta">
+        <span class="badge bg-primary-subtle text-primary">${escHtml(s.subject || 'Général')}</span>
+        <span class="text-muted">${formatDate(s.created_at)}</span>
+      </div>
+      <div class="session-item-meta mt-1">
+        <small class="text-muted"><i class="bi bi-card-text me-1"></i>${s.qa_count} Q/R &nbsp; <i class="bi bi-journal me-1"></i>${s.summary_count} fiches</small>
+        <button class="btn btn-link btn-sm text-danger p-0 delete-btn" onclick="deleteSession(event, ${s.id})">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function loadAndShowSession(id) {
+  showLoading("Chargement de la session…");
+  try {
+    const res     = await fetch(API_BASE + `/sessions/${id}`);
+    if (!res.ok) throw new Error("Session introuvable");
+    const session = await res.json();
+    currentSessionId = id;
+    renderResults(session);
+    loadSessions(); // refresh sidebar active state
+  } catch (err) {
+    showUpload();
+    showToast(err.message, "danger");
+  }
+}
+
+async function deleteSession(event, id) {
+  event.stopPropagation();
+  if (!confirm("Supprimer cette session ?")) return;
+  await fetch(API_BASE + `/sessions/${id}`, { method: "DELETE" });
+  if (currentSessionId === id) showUpload();
+  await loadSessions();
+  showToast("Session supprimée.", "success");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Render results
+// ─────────────────────────────────────────────────────────────────────────────
+function renderResults(session) {
+  currentSession = session;
+  document.getElementById("resultsTitle").textContent   = session.title;
+  document.getElementById("resultsSubtitle").textContent = `${session.subject || 'Général'} · ${formatDate(session.created_at)}`;
+
+  // Stats
+  const now = new Date();
+  const dueCount = session.qa_items.filter(q => new Date(q.next_review) <= now).length;
+  document.getElementById("statsRow").innerHTML = `
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-number text-primary">${session.qa_items.length}</div>
+        <div class="stat-label">Questions</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-number text-warning">${dueCount}</div>
+        <div class="stat-label">À réviser</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-number text-success">${session.summaries.length}</div>
+        <div class="stat-label">Résumés</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-number text-info">${session.qa_items.reduce((a,q)=>a+q.review_count,0)}</div>
+        <div class="stat-label">Révisions totales</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("qaTabBadge").textContent      = session.qa_items.length;
+  document.getElementById("summaryTabBadge").textContent = session.summaries.length;
+
+  // Q&A cards
+  const qaCards = document.getElementById("qaCards");
+  qaCards.innerHTML = session.qa_items.map((q, i) => {
+    const due      = new Date(q.next_review) <= now;
+    const daysLeft = Math.ceil((new Date(q.next_review) - now) / 86400000);
+    const badge    = due
+      ? `<span class="badge bg-warning text-dark"><i class="bi bi-alarm me-1"></i>À réviser</span>`
+      : `<span class="badge bg-success-subtle text-success"><i class="bi bi-check2 me-1"></i>Revoir dans ${daysLeft}j</span>`;
+
+    return `
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="flashcard" id="fc-${q.id}" onclick="flipCard(${q.id})">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">
+            <div class="flashcard-index">${i + 1}</div>
+            <div class="flashcard-question">${escHtml(sanitizeMath(q.question))}</div>
+            <div class="flashcard-hint text-muted small mt-auto pt-2">
+              <i class="bi bi-hand-index me-1"></i>Clique pour voir la réponse
+            </div>
+          </div>
+          <div class="flashcard-back">
+            <div class="flashcard-answer">${escHtml(sanitizeMath(q.answer))}</div>
+            <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+              ${badge}
+              <button class="btn btn-sm btn-outline-primary review-btn"
+                onclick="markReviewed(event, ${q.id})">
+                <i class="bi bi-check-lg me-1"></i>Révisé
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Summaries accordion
+  const acc = document.getElementById("summaryAccordion");
+  acc.innerHTML = session.summaries.map((s, i) => `
+    <div class="accordion-item border-0 mb-2 shadow-sm rounded overflow-hidden">
+      <h2 class="accordion-header">
+        <button class="accordion-button ${i > 0 ? 'collapsed' : ''} fw-semibold"
+          type="button" data-bs-toggle="collapse" data-bs-target="#sum-${s.id}">
+          <i class="bi bi-bookmark-fill text-primary me-2"></i>${escHtml(s.chapter_title)}
+        </button>
+      </h2>
+      <div id="sum-${s.id}" class="accordion-collapse collapse ${i === 0 ? 'show' : ''}">
+        <div class="accordion-body summary-content">${escHtml(sanitizeMath(s.content))}</div>
+      </div>
+    </div>
+  `).join("");
+
+  showResults();
+
+  // Trigger KaTeX re-render after DOM update
+  setTimeout(() => {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.getElementById("qaCards"),       { delimiters: [{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}], throwOnError:false, strict:false });
+      renderMathInElement(document.getElementById("summaryAccordion"), { delimiters: [{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}], throwOnError:false, strict:false });
+    }
+  }, 100);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Flashcard interactions
+// ─────────────────────────────────────────────────────────────────────────────
+function flipCard(id) {
+  const card = document.getElementById(`fc-${id}`);
+  if (card) card.classList.toggle("flipped");
+}
+
+async function markReviewed(event, id) {
+  event.stopPropagation();
+  try {
+    const res  = await fetch(API_BASE + `/qa/${id}/review`, { method: "PATCH" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+    // Reload the session to refresh badges
+    await loadAndShowSession(currentSessionId);
+    showToast("Carte marquée comme révisée !", "success");
+  } catch (err) {
+    showToast("Erreur : " + err.message, "danger");
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tabs
+// ─────────────────────────────────────────────────────────────────────────────
+function showTab(tab) {
+  const qaTab  = document.getElementById("qaTab");
+  const sumTab = document.getElementById("summariesTab");
+  const btns   = document.querySelectorAll("#resultTabs .nav-link");
+
+  if (tab === "qa") {
+    qaTab.classList.remove("d-none");
+    sumTab.classList.add("d-none");
+    btns[0].classList.add("active");
+    btns[1].classList.remove("active");
+  } else {
+    qaTab.classList.add("d-none");
+    sumTab.classList.remove("d-none");
+    btns[0].classList.remove("active");
+    btns[1].classList.add("active");
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Export
+// ─────────────────────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!currentSessionId) return;
+  window.location.href = `/export/${currentSessionId}/csv`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Section visibility helpers
+// ─────────────────────────────────────────────────────────────────────────────
+function showLoading(msg = "L'IA lit ton cours et génère les fiches.") {
+  document.getElementById("uploadSection").classList.add("d-none");
+  document.getElementById("loadingSection").classList.remove("d-none");
+  document.getElementById("resultsSection").classList.add("d-none");
+  document.getElementById("practiceSection").classList.add("d-none");
+  document.getElementById("loadingMsg").textContent = msg;
+}
+function showResults() {
+  document.getElementById("uploadSection").classList.add("d-none");
+  document.getElementById("loadingSection").classList.add("d-none");
+  document.getElementById("resultsSection").classList.remove("d-none");
+  document.getElementById("practiceSection").classList.add("d-none");
+}
+function showUpload() {
+  document.getElementById("uploadSection").classList.remove("d-none");
+  document.getElementById("loadingSection").classList.add("d-none");
+  document.getElementById("resultsSection").classList.add("d-none");
+  document.getElementById("practiceSection").classList.add("d-none");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Utilities
+// ─────────────────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  const d = document.createElement("div");
+  d.textContent = str || "";
+  return d.innerHTML;
+}
+
+// Retire les délimiteurs $...$ quand le contenu est du texte français (accents)
+// et non une vraie formule mathématique
+function sanitizeMath(text) {
+  return (text || "").replace(/\$\$?([\s\S]+?)\$?\$/g, (match, inner) => {
+    if (/[àâäéèêëîïôùûüçœæÀÂÄÉÈÊËÎÏÔÙÛÜÇŒÆ]/.test(inner)) return inner;
+    return match;
+  });
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("fr-FR", { day:"2-digit", month:"short", year:"numeric" });
+}
+
+function showToast(message, type = "info") {
+  const id   = "toast-" + Date.now();
+  const icon = { success:"check-circle-fill", danger:"exclamation-triangle-fill", warning:"exclamation-circle-fill", info:"info-circle-fill" }[type] || "info-circle-fill";
+  const html = `
+    <div id="${id}" class="toast align-items-center text-bg-${type} border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body"><i class="bi bi-${icon} me-2"></i>${escHtml(message)}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>`;
+  document.getElementById("toastContainer").insertAdjacentHTML("beforeend", html);
+  const toastEl = document.getElementById(id);
+  new bootstrap.Toast(toastEl, { delay: 4000 }).show();
+  toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Practice Mode
+// ─────────────────────────────────────────────────────────────────────────────
+let practiceQueue   = [];
+let practiceTotal   = 0;
+let practiceCorrect = 0;
+
+function startPractice() {
+  if (!currentSession || !currentSession.qa_items.length) {
+    showToast("Aucune carte disponible.", "warning");
+    return;
+  }
+  // Shuffle a copy of the cards
+  practiceQueue   = [...currentSession.qa_items].sort(() => Math.random() - 0.5);
+  practiceTotal   = practiceQueue.length;
+  practiceCorrect = 0;
+
+  document.getElementById("resultsSection").classList.add("d-none");
+  document.getElementById("practiceSection").classList.remove("d-none");
+  document.getElementById("practiceEndScreen").classList.add("d-none");
+  document.getElementById("practiceCardArea").classList.remove("d-none");
+
+  renderPracticeCard();
+}
+
+function renderPracticeCard() {
+  const remaining = practiceQueue.length;
+  const done      = practiceTotal - remaining;
+  const pct       = (done / practiceTotal) * 100;
+
+  document.getElementById("practiceProgress").textContent =
+    `${done} / ${practiceTotal} · ${remaining} restante${remaining > 1 ? "s" : ""}`;
+  document.getElementById("practiceProgressBar").style.width = pct + "%";
+
+  if (!remaining) { endPractice(); return; }
+
+  const card = practiceQueue[0];
+  document.getElementById("practiceCardArea").innerHTML = `
+    <div class="practice-card">
+      <div class="practice-label text-primary mb-2">
+        <i class="bi bi-question-circle me-1"></i>Question
+      </div>
+      <div class="practice-text">${escHtml(sanitizeMath(card.question))}</div>
+
+      <div class="mt-3">
+        <button class="btn btn-link btn-sm text-muted p-0" onclick="togglePracticeAnswer()">
+          <i class="bi bi-eye me-1"></i>Voir la réponse
+        </button>
+        <div id="practiceAnswerBox" class="practice-answer-box d-none mt-2">
+          <hr class="practice-divider mt-0" />
+          <div class="practice-label text-success mb-1">
+            <i class="bi bi-lightbulb me-1"></i>Réponse
+          </div>
+          <div class="practice-text">${escHtml(sanitizeMath(card.answer))}</div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-auto pt-3">
+        <button class="btn btn-danger flex-fill" onclick="answerPractice(false)">
+          <i class="bi bi-x-lg me-1"></i>Je ne savais pas
+        </button>
+        <button class="btn btn-success flex-fill" onclick="answerPractice(true)">
+          <i class="bi bi-check-lg me-1"></i>Je savais !
+        </button>
+      </div>
+    </div>`;
+
+  setTimeout(() => {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.getElementById("practiceCardArea"), {
+        delimiters: [{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],
+        throwOnError: false, strict: false,
+      });
+    }
+  }, 50);
+}
+
+
+function togglePracticeAnswer() {
+  const box = document.getElementById("practiceAnswerBox");
+  box.classList.toggle("d-none");
+  if (window.renderMathInElement && !box.classList.contains("d-none")) {
+    renderMathInElement(box, {
+      delimiters: [{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],
+      throwOnError: false, strict: false,
+    });
+  }
+}
+
+function answerPractice(knew) {
+  const card = practiceQueue.shift();
+  if (knew) {
+    practiceCorrect++;
+    fetch(API_BASE + `/qa/${card.id}/review`, { method: "PATCH" }).catch(() => {});
+  } else {
+    practiceQueue.push(card); // remet à la fin
+  }
+  renderPracticeCard();
+}
+
+function endPractice() {
+  document.getElementById("practiceCardArea").classList.add("d-none");
+  document.getElementById("practiceProgressBar").style.width = "100%";
+  document.getElementById("practiceProgress").textContent =
+    `${practiceTotal} / ${practiceTotal} cartes`;
+
+  const pct   = Math.round((practiceCorrect / practiceTotal) * 100);
+  const emoji = pct >= 80 ? "🏆" : pct >= 50 ? "💪" : "📚";
+  document.getElementById("practiceEndEmoji").textContent = emoji;
+  document.getElementById("practiceEndStats").textContent =
+    `${practiceCorrect} sur ${practiceTotal} cartes réussies — ${pct}% de réussite`;
+  document.getElementById("practiceEndScreen").classList.remove("d-none");
+}
+
+function closePractice() {
+  document.getElementById("practiceSection").classList.add("d-none");
+  document.getElementById("resultsSection").classList.remove("d-none");
+  if (currentSessionId) loadAndShowSession(currentSessionId);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────────────────────────────────────────
+loadSessions();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "builds": [
+    { "src": "api/index.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/upload",          "dest": "/api/index.py" },
+    { "src": "/sessions",        "dest": "/api/index.py" },
+    { "src": "/sessions/(.*)",   "dest": "/api/index.py" },
+    { "src": "/qa/(.*)",         "dest": "/api/index.py" },
+    { "src": "/export/(.*)",     "dest": "/api/index.py" },
+    { "src": "/auth/(.*)",       "dest": "/api/index.py" },
+    { "src": "/billing/(.*)",    "dest": "/api/index.py" },
+    { "src": "/(.*)",            "dest": "/$1"           }
+  ]
+}
