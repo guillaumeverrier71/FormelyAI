@@ -1,4 +1,8 @@
 import "./style.css";
+import { inject } from '@vercel/analytics';
+
+// Initialize Vercel Web Analytics
+inject();
 
 const API_BASE = "";
 
@@ -853,7 +857,7 @@ async function createManualSession() {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────��───────────────────────────────────
 // Q/R Modal (add & edit)
 // ─────────────────────────────────────────────────────────────────────────────
 let qaModalMode = "add";
