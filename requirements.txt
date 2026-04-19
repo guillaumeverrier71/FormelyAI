@@ -9,6 +9,6 @@ aiofiles
 fpdf2
 python-dotenv
 python-jose[cryptography]
-passlib[bcrypt]
 stripe
 genanki
+google-auth

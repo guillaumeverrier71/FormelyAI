@@ -49,18 +49,27 @@ def _parse_json_response(raw: str) -> dict:
         }
 
 
-def generate_qa_and_summaries(text: str, subject: str) -> dict:
+def generate_qa_and_summaries(text: str, subject: str, max_qa: int = None) -> dict:
     chunks = extract_text_chunks(text)
     all_qa: list[dict] = []
     all_summaries: list[dict] = []
 
+    # Distribute QA budget across chunks
+    qa_per_chunk = max_qa // len(chunks) if max_qa and len(chunks) > 0 else 8
+    qa_limit_label = f"maximum {qa_per_chunk} Q/R" if max_qa else "maximum 8 Q/R"
+
     for i, chunk in enumerate(chunks):
         chunk_label = f"(partie {i + 1}/{len(chunks)})" if len(chunks) > 1 else ""
+        remaining_budget = (max_qa - len(all_qa)) if max_qa else None
+        if remaining_budget is not None and remaining_budget <= 0:
+            break
+        chunk_qa_limit = min(remaining_budget, qa_per_chunk) if remaining_budget else qa_per_chunk
+        qa_limit_str = f"maximum {chunk_qa_limit} Q/R" if max_qa else "maximum 8 Q/R"
 
         prompt = f"""Tu es un assistant pédagogique expert. Voici un texte de cours sur {subject} {chunk_label}.
 
 Génère :
-1. Une liste de questions/réponses pour chaque concept clé (maximum 8 Q/R, sois concis)
+1. Une liste de questions/réponses pour chaque concept clé ({qa_limit_str}, sois concis)
 2. Des fiches résumées pour chaque chapitre ou section détectée
 
 Règles :
@@ -91,7 +100,9 @@ Texte du cours :
                 messages=[{"role": "user", "content": prompt}],
             )
             raw = message.content[0].text
+            print(f"[ai_service] Réponse brute partie {i+1} ({len(raw)} chars): {raw[:200]}")
             parsed = _parse_json_response(raw)
+            print(f"[ai_service] Parsé: {len(parsed.get('qa',[]))} Q/R, {len(parsed.get('summaries',[]))} résumés")
         except Exception as e:
             print(f"[ai_service] Erreur partie {i+1}: {e}")
             parsed = {"qa": [], "summaries": []}
@@ -108,5 +119,9 @@ Texte du cours :
 
         all_qa.extend(valid_qa)
         all_summaries.extend(valid_summaries)
+
+    # Hard cap on QA in case AI ignored the limit
+    if max_qa:
+        all_qa = all_qa[:max_qa]
 
     return {"qa": all_qa, "summaries": all_summaries}

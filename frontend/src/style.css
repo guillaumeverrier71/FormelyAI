@@ -2,10 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── CSS Variables (light / dark) ── */
+:root {
+  --bg-page:       #f8fafc;
+  --bg-card:       #ffffff;
+  --bg-card-alt:   #f5f3ff;
+  --bg-input:      #ffffff;
+  --bg-sidebar:    #ffffff;
+  --bg-hover:      #f5f3ff;
+  --border:        #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-primary:  #1e293b;
+  --text-secondary:#475569;
+  --text-muted:    #94a3b8;
+  --flashcard-back:#f5f3ff;
+  --flashcard-back-border: #ddd6fe;
+  --drop-bg:       #f8fafc;
+  --stat-bg:       #ffffff;
+  --summary-text:  #475569;
+}
+
+html.dark {
+  --bg-page:       #0f172a;
+  --bg-card:       #1e293b;
+  --bg-card-alt:   #1a1433;
+  --bg-input:      #1e293b;
+  --bg-sidebar:    #1e293b;
+  --bg-hover:      #2d1f5e22;
+  --border:        #334155;
+  --border-strong: #475569;
+  --text-primary:  #f1f5f9;
+  --text-secondary:#94a3b8;
+  --text-muted:    #64748b;
+  --flashcard-back:#1a1433;
+  --flashcard-back-border: #4c1d95;
+  --drop-bg:       #1e293b;
+  --stat-bg:       #1e293b;
+  --summary-text:  #94a3b8;
+}
+
 @layer base {
+  html { overflow-x: hidden; }
+
   body {
     font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
   }
+
+
 
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -58,36 +103,39 @@
   }
 
   .flashcard-front {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-top: 3px solid #7c3aed;
+    color: var(--text-primary);
   }
 
   .flashcard-back {
-    background: #f5f3ff;
-    border: 1px solid #ddd6fe;
+    background: var(--flashcard-back);
+    border: 1px solid var(--flashcard-back-border);
     border-top: 3px solid #a78bfa;
     transform: rotateY(180deg);
+    color: var(--text-primary);
   }
 
   /* ── Practice Card ── */
   .practice-card {
     width: 100%;
     max-width: 580px;
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: 20px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-top: 4px solid #7c3aed;
     padding: 2rem;
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 24px rgba(124, 58, 237, 0.08);
     min-height: 360px;
+    color: var(--text-primary);
   }
 
   .practice-divider {
     border: none;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     margin: 0.75rem 0 1rem;
   }
 
@@ -98,32 +146,34 @@
     cursor: pointer;
     border: 1.5px solid transparent;
     transition: background 0.15s ease, border-color 0.15s ease;
+    color: var(--text-primary);
   }
 
   .session-item:hover {
-    background: #f5f3ff;
+    background: var(--bg-hover);
   }
 
   .session-item.active {
-    background: #f5f3ff;
+    background: var(--bg-hover);
     border-color: #7c3aed;
   }
 
   /* ── Drop Zone ── */
   .drop-zone {
-    border: 2px dashed #cbd5e1;
+    border: 2px dashed var(--border-strong);
     border-radius: 16px;
-    background: #f8fafc;
+    background: var(--drop-bg);
     padding: 2rem 1.5rem;
     text-align: center;
     cursor: pointer;
     transition: border-color 0.2s ease, background 0.2s ease;
+    color: var(--text-secondary);
   }
 
   .drop-zone:hover,
   .drop-zone.drag-over {
     border-color: #7c3aed;
-    background: #f5f3ff;
+    background: var(--bg-hover);
   }
 
   .drop-zone.file-chosen {
@@ -133,11 +183,11 @@
 
   /* ── Stat Card ── */
   .stat-card {
-    background: #ffffff;
+    background: var(--stat-bg);
     border-radius: 16px;
     padding: 1.1rem;
     text-align: center;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   }
 
@@ -159,14 +209,22 @@
     font-size: 0.875rem;
     line-height: 1.7;
     white-space: pre-wrap;
-    color: #475569;
+    color: var(--summary-text);
+  }
+
+  /* ── FAQ accordion chevron ── */
+  details summary .bi-chevron-down {
+    transition: transform 0.2s;
+  }
+  details[open] summary .bi-chevron-down {
+    transform: rotate(180deg);
   }
 
   /* ── OR Divider ── */
   .or-divider {
     display: flex;
     align-items: center;
-    color: #94a3b8;
+    color: var(--text-muted);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -179,13 +237,24 @@
     content: "";
     flex: 1;
     height: 1px;
-    background: #e2e8f0;
+    background: var(--border);
   }
 
   .or-divider span { padding: 0 0.75rem; }
+
+  /* ── Mobile nav row (bar 2) padding compensation ── */
+  #mainLayout {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 3.5rem + 1rem);
+  }
+
+  @media (max-width: 767px) {
+    body.has-nav2 #mainLayout {
+      padding-top: calc(env(safe-area-inset-top, 0px) + 3.5rem + 2.75rem + 1rem);
+    }
+  }
 }
 
 @media (max-width: 767px) {
-  .flashcard { height: 210px; }
-  .practice-card { min-height: 320px; padding: 1.5rem; }
+  .flashcard { height: 200px; }
+  .practice-card { min-height: 300px; padding: 1.25rem; }
 }
