@@ -1097,6 +1097,15 @@ function updateNavbar() {
     if (navPracticeBtn) { navPracticeBtn.classList.remove("hidden"); navPracticeBtn.classList.add("flex"); }
     const navDashboardBtn = document.getElementById("navDashboardBtn");
     if (navDashboardBtn) { navDashboardBtn.classList.remove("hidden"); navDashboardBtn.classList.add("flex"); }
+    const navAdminBtn = document.getElementById("navAdminBtn");
+    const mobileAdminBtn = document.getElementById("mobileAdminBtn");
+    if (currentUser.is_admin) {
+      if (navAdminBtn) { navAdminBtn.classList.remove("hidden"); navAdminBtn.classList.add("flex"); }
+      if (mobileAdminBtn) { mobileAdminBtn.classList.remove("hidden"); mobileAdminBtn.classList.add("flex"); }
+    } else {
+      if (navAdminBtn) navAdminBtn.classList.add("hidden");
+      if (mobileAdminBtn) mobileAdminBtn.classList.add("hidden");
+    }
     updateUsageBar();
     updateXPWidget(currentUser);
     // Show free limit notice only for free users
@@ -1865,7 +1874,7 @@ function exportPDF() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Section visibility helpers
 // ─────────────────────────────────────────────────────────────────────────────
-const ALL_SECTIONS = ["uploadSection", "loadingSection", "resultsSection", "practiceSection", "manualSection", "librarySection", "practiceSelectSection", "dashboardSection"];
+const ALL_SECTIONS = ["uploadSection", "loadingSection", "resultsSection", "practiceSection", "manualSection", "librarySection", "practiceSelectSection", "dashboardSection", "adminSection"];
 function hideAll() { ALL_SECTIONS.forEach((id) => document.getElementById(id).classList.add("hidden")); }
 
 function showLoading(msg = null) {
@@ -2566,6 +2575,37 @@ function showDashboard() {
   loadDashboard();
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin
+// ─────────────────────────────────────────────────────────────────────────────
+async function showAdmin() {
+  if (!currentUser?.is_admin) return;
+  hideAll();
+  document.getElementById("adminSection").classList.remove("hidden");
+
+  try {
+    const data = await apiFetch("/admin/stats");
+    document.getElementById("adminTotalUsers").textContent    = data.total_users;
+    document.getElementById("adminPremiumUsers").textContent  = data.premium_users;
+    document.getElementById("adminFreeUsers").textContent     = data.free_users;
+    document.getElementById("adminNewUsersWeek").textContent  = "+" + data.new_users_week;
+    document.getElementById("adminNewUsersMonth").textContent = "+" + data.new_users_month;
+    document.getElementById("adminTotalSessions").textContent = data.total_sessions;
+    document.getElementById("adminNewSessionsWeek").textContent = "+" + data.new_sessions_week;
+    document.getElementById("adminTotalCards").textContent    = data.total_cards;
+    document.getElementById("adminTotalReviews").textContent  = data.total_reviews;
+
+    const list = document.getElementById("adminRecentUsers");
+    list.innerHTML = data.recent_users.map(u => `
+      <div class="flex items-center justify-between py-1.5 border-b last:border-0" style="border-color:var(--border)">
+        <span>${u.email}</span>
+        <span class="text-xs" style="color:var(--text-muted)">${u.created_at}</span>
+      </div>`).join("");
+  } catch {
+    showToast("Erreur lors du chargement des stats.", "error");
+  }
+}
+
 async function loadDashboard() {
   document.getElementById("dashKpis").innerHTML = `
     <div class="stat-card col-span-2 md:col-span-4 text-center text-slate-400 text-sm py-6">
@@ -2948,6 +2988,7 @@ window.showContact = showContact;
 window.hideContact = hideContact;
 window.handleGoogleCredential = handleGoogleCredential;
 window.showDashboard = showDashboard;
+window.showAdmin = showAdmin;
 window.toggleExportMenu = toggleExportMenu;
 window.showPracticeSelect = showPracticeSelect;
 window.renderPracticeSelectList = renderPracticeSelectList;

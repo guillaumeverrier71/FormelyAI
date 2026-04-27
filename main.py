@@ -1401,3 +1401,45 @@ def export_pdf(session_id: int, user: User = Depends(get_current_user), db: DBSe
         media_type="application/pdf",
         filename=f"session_{session_id}.pdf",
     )
+
+
+# ---------------------------------------------------------------------------
+# Admin stats
+# ---------------------------------------------------------------------------
+@app.get("/admin/stats")
+def admin_stats(user: User = Depends(get_current_user), db: DBSession = Depends(get_db)):
+    if not is_admin(user):
+        raise HTTPException(403, "Accès refusé.")
+
+    total_users     = db.query(func.count(User.id)).scalar()
+    premium_users   = db.query(func.count(Subscription.id)).filter(Subscription.plan == "premium").scalar()
+    total_sessions  = db.query(func.count(Session.id)).scalar()
+    total_cards     = db.query(func.count(QA.id)).scalar()
+    total_summaries = db.query(func.count(Summary.id)).scalar()
+    total_reviews   = db.query(func.count(ReviewLog.id)).scalar()
+
+    week_ago  = datetime.utcnow() - timedelta(days=7)
+    month_ago = datetime.utcnow() - timedelta(days=30)
+    new_users_week  = db.query(func.count(User.id)).filter(User.created_at >= week_ago).scalar()
+    new_users_month = db.query(func.count(User.id)).filter(User.created_at >= month_ago).scalar()
+    new_sessions_week  = db.query(func.count(Session.id)).filter(Session.created_at >= week_ago).scalar()
+    new_sessions_month = db.query(func.count(Session.id)).filter(Session.created_at >= month_ago).scalar()
+
+    # Last 10 registered users
+    recent_users = db.query(User).order_by(User.created_at.desc()).limit(10).all()
+    recent = [{"email": u.email, "created_at": u.created_at.strftime("%Y-%m-%d %H:%M")} for u in recent_users]
+
+    return {
+        "total_users": total_users,
+        "premium_users": premium_users,
+        "free_users": total_users - premium_users,
+        "new_users_week": new_users_week,
+        "new_users_month": new_users_month,
+        "total_sessions": total_sessions,
+        "new_sessions_week": new_sessions_week,
+        "new_sessions_month": new_sessions_month,
+        "total_cards": total_cards,
+        "total_summaries": total_summaries,
+        "total_reviews": total_reviews,
+        "recent_users": recent,
+    }

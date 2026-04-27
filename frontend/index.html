@@ -86,6 +86,9 @@
         <button onclick="showUpload()" class="hidden md:flex text-slate-400 hover:text-white text-sm items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-800 transition">
           <i class="bi bi-plus-lg"></i><span class="hidden lg:inline" data-i18n="nav.new">Nouveau</span>
         </button>
+        <button onclick="showAdmin()" id="navAdminBtn" class="hidden md:flex text-red-400 hover:text-red-300 px-2 py-1.5 rounded-lg hover:bg-slate-800 transition" title="Admin">
+          <i class="bi bi-shield-lock"></i>
+        </button>
         <button onclick="logout()" id="navLogoutBtn" class="hidden md:flex text-slate-400 hover:text-white px-2 py-1.5 rounded-lg hover:bg-slate-800 transition">
           <i class="bi bi-box-arrow-right"></i>
         </button>
@@ -117,6 +120,10 @@
       <button onclick="showDashboard()" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-slate-400 hover:text-violet-400 transition py-1 text-xs">
         <i class="bi bi-bar-chart-line text-base"></i>
         <span data-i18n="nav.dashboard">Stats</span>
+      </button>
+      <button onclick="showAdmin()" id="mobileAdminBtn" class="hidden flex-1 flex flex-col items-center justify-center gap-0.5 text-red-400 hover:text-red-300 transition py-1 text-xs">
+        <i class="bi bi-shield-lock text-base"></i>
+        <span>Admin</span>
       </button>
       <button onclick="logout()" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-slate-400 hover:text-red-400 transition py-1 text-xs">
         <i class="bi bi-box-arrow-right text-base"></i>
@@ -808,6 +815,69 @@
             class="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-2">
             <i class="bi bi-plus-lg"></i><span data-i18n="manual.create">Créer le deck</span>
           </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ADMIN ── -->
+    <section id="adminSection" class="hidden">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+            <i class="bi bi-shield-lock-fill text-red-600 text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold" style="color:var(--text-primary)">Admin</h1>
+            <p class="text-xs" style="color:var(--text-muted)">Vue globale de la plateforme</p>
+          </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-violet-600" id="adminTotalUsers">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">Comptes total</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-green-600" id="adminPremiumUsers">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">Comptes Premium</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-slate-600" id="adminFreeUsers">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">Comptes Free</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-blue-600" id="adminNewUsersWeek">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">Nouveaux cette semaine</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-blue-400" id="adminNewUsersMonth">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">Nouveaux ce mois</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-violet-500" id="adminTotalSessions">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">PDFs générés</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-violet-400" id="adminNewSessionsWeek">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">PDFs cette semaine</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-amber-500" id="adminTotalCards">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">Fiches créées</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-2xl font-bold text-green-500" id="adminTotalReviews">—</p>
+            <p class="text-xs mt-1" style="color:var(--text-muted)">Révisions effectuées</p>
+          </div>
+        </div>
+
+        <!-- Recent users -->
+        <div class="rounded-xl border p-4" style="background:var(--bg-card);border-color:var(--border)">
+          <h2 class="text-sm font-semibold mb-3" style="color:var(--text-primary)">Derniers inscrits</h2>
+          <div id="adminRecentUsers" class="flex flex-col gap-2 text-sm" style="color:var(--text-secondary)">
+            <p class="text-xs" style="color:var(--text-muted)">Chargement…</p>
+          </div>
         </div>
       </div>
     </section>
