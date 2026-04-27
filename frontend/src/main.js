@@ -295,7 +295,7 @@ const TRANSLATIONS = {
     "landing.free.gen": "génération IA gratuite<br/><span class=\"text-xs font-normal text-slate-400\">(10 pages · 10 fiches)</span>",
     "landing.free.decks": "decks manuels<br/>sans limite",
     "landing.free.practice": "révisions &<br/>Practice",
-    "landing.free.premium": "Premium : 20 générations/mois · Export Anki & PDF · Stats avancées — <strong>5,99€/mois</strong>",
+    "landing.free.premium": "Premium : 20 générations/mois · Export Anki & PDF · Stats avancées — <strong>3,99€/mois</strong>",
     "landing.faq.title": "Questions fréquentes",
     "landing.card.label.question": "Question",
     "landing.card.question": "Qu'est-ce que la photosynthèse ?",
@@ -593,7 +593,7 @@ const TRANSLATIONS = {
     "landing.free.gen": "free AI generation<br/><span class=\"text-xs font-normal text-slate-400\">(10 pages · 10 cards)</span>",
     "landing.free.decks": "manual decks<br/>unlimited",
     "landing.free.practice": "reviews &<br/>Practice",
-    "landing.free.premium": "Premium: 20 generations/month · Anki & PDF export · Advanced stats — <strong>€5.99/month</strong>",
+    "landing.free.premium": "Premium: 20 generations/month · Anki & PDF export · Advanced stats — <strong>€3.99/month</strong>",
     "landing.faq.title": "Frequently asked questions",
     "landing.card.label.question": "Question",
     "landing.card.question": "What is photosynthesis?",
@@ -937,7 +937,7 @@ const LEGAL_CONTENT = {
     fr: { title: "Conditions Générales d'Utilisation", body: `
       <p><strong>1. Objet</strong><br>FormelyAI est un service permettant de générer des fiches de révision à partir de documents PDF ou de textes, grâce à l'intelligence artificielle.</p>
       <p><strong>2. Accès au service</strong><br>L'accès est possible sans inscription pour la génération (dans la limite du plan gratuit). La création d'un compte permet de sauvegarder les sessions.</p>
-      <p><strong>3. Plan gratuit et Premium</strong><br>Le plan gratuit permet 1 upload PDF. Le plan Premium (5,99 €/mois) offre 20 uploads par mois et des fonctionnalités avancées. Des crédits supplémentaires sont disponibles à 1 € pour 3 PDF.</p>
+      <p><strong>3. Plan gratuit et Premium</strong><br>Le plan gratuit permet 1 upload PDF. Le plan Premium (3,99 €/mois) offre 20 uploads par mois et des fonctionnalités avancées. Des crédits supplémentaires sont disponibles à 1 € pour 3 PDF.</p>
       <p><strong>4. Données utilisateur</strong><br>Les contenus uploadés sont traités par l'IA et stockés pour permettre la révision. L'utilisateur reste propriétaire de ses données.</p>
       <p><strong>5. Responsabilité</strong><br>FormelyAI ne garantit pas l'exactitude des fiches générées par l'IA. L'utilisateur est invité à vérifier les informations.</p>
       <p><strong>6. Résiliation</strong><br>L'abonnement Premium peut être résilié à tout moment via le portail Stripe. L'accès Premium reste actif jusqu'à la fin de la période payée.</p>
@@ -946,7 +946,7 @@ const LEGAL_CONTENT = {
     en: { title: "Terms of Service", body: `
       <p><strong>1. Purpose</strong><br>FormelyAI is a service that generates revision flashcards from PDF documents or text using artificial intelligence.</p>
       <p><strong>2. Access</strong><br>Free access allows 1 PDF upload. Creating an account enables session saving.</p>
-      <p><strong>3. Free & Premium plans</strong><br>The Premium plan (€5.99/month) offers 20 uploads per month and advanced features. Additional credits are available at €1 for 3 PDFs.</p>
+      <p><strong>3. Free & Premium plans</strong><br>The Premium plan (€3.99/month) offers 20 uploads per month and advanced features. Additional credits are available at €1 for 3 PDFs.</p>
       <p><strong>4. User data</strong><br>Uploaded content is processed by AI and stored to enable revision. Users retain ownership of their data.</p>
       <p><strong>5. Liability</strong><br>FormelyAI does not guarantee the accuracy of AI-generated cards. Users should verify information.</p>
       <p><strong>6. Cancellation</strong><br>Premium subscriptions can be cancelled anytime via the Stripe portal.</p>
