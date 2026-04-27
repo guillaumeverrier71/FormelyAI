@@ -258,3 +258,15 @@ html.dark {
   .flashcard { height: 200px; }
   .practice-card { min-height: 300px; padding: 1.25rem; }
 }
+
+/* ── Landing: upload form appears above marketing content ── */
+#uploadSection {
+  display: flex;
+  flex-direction: column;
+}
+#uploadForm {
+  order: 1;
+}
+#landingMarketing {
+  order: 2;
+}

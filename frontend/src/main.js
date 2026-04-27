@@ -1070,6 +1070,7 @@ function updateNavbar() {
   const navUpgradeBtn = document.getElementById("navUpgradeBtn");
 
   const landingHero = document.getElementById("landingHero");
+  const landingMarketing = document.getElementById("landingMarketing");
   const uploadFormHeader = document.getElementById("uploadFormHeader");
 
   const mobileNavRow = document.getElementById("mobileNavRow");
@@ -1078,6 +1079,7 @@ function updateNavbar() {
     if (mobileNavRow) mobileNavRow.classList.remove("hidden");
     document.body.classList.add("has-nav2");
     if (landingHero) landingHero.classList.add("hidden");
+    if (landingMarketing) landingMarketing.classList.add("hidden");
     if (uploadFormHeader) uploadFormHeader.classList.remove("hidden");
     navUser.classList.remove("hidden");
     navUser.classList.add("flex");
@@ -1121,6 +1123,7 @@ function updateNavbar() {
     }
   } else {
     if (landingHero) landingHero.classList.remove("hidden");
+    if (landingMarketing) landingMarketing.classList.remove("hidden");
     if (uploadFormHeader) uploadFormHeader.classList.add("hidden");
     const freeLimitNotice = document.getElementById("freeLimitNotice");
     if (freeLimitNotice) { freeLimitNotice.classList.add("hidden"); freeLimitNotice.classList.remove("flex"); }
