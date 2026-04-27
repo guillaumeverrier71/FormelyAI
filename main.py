@@ -673,15 +673,20 @@ def billing_subscribe(user: User = Depends(get_current_user), db: DBSession = De
             sub.stripe_customer_id = customer_id
             db.commit()
 
-    session = stripe.checkout.Session.create(
-        customer=customer_id,
-        payment_method_types=["card"],
-        line_items=[{"price": STRIPE_PRICE_MONTHLY, "quantity": 1}],
-        mode="subscription",
-        success_url=APP_URL + "/?subscribed=1",
-        cancel_url=APP_URL + "/",
-        metadata={"user_id": str(user.id), "type": "subscription"},
-    )
+    if not STRIPE_PRICE_MONTHLY:
+        raise HTTPException(503, "STRIPE_PRICE_MONTHLY non configuré.")
+    try:
+        session = stripe.checkout.Session.create(
+            customer=customer_id,
+            payment_method_types=["card"],
+            line_items=[{"price": STRIPE_PRICE_MONTHLY, "quantity": 1}],
+            mode="subscription",
+            success_url=APP_URL + "/?subscribed=1",
+            cancel_url=APP_URL + "/",
+            metadata={"user_id": str(user.id), "type": "subscription"},
+        )
+    except stripe.error.StripeError as e:
+        raise HTTPException(500, str(e.user_message or e))
     return {"url": session.url}
 
 
