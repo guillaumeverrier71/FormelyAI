@@ -503,6 +503,10 @@ class LoginBody(BaseModel):
 async def index():
     return FileResponse("frontend/dist/index.html")
 
+@app.get("/privacy")
+async def privacy():
+    return FileResponse("frontend/privacy.html")
+
 
 @app.get("/auth/google-client-id")
 def google_client_id_endpoint():

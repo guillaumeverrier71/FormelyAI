@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Politique de confidentialité – FormelyAI</title>
+  <meta name="description" content="Politique de confidentialité et protection des données de FormelyAI." />
+  <link rel="icon" type="image/x-icon" href="/icons/favicon.ico" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+    .prose h2 { margin-top: 2rem; margin-bottom: 0.75rem; font-size: 1.125rem; font-weight: 700; color: #1e293b; }
+    .prose h3 { margin-top: 1.25rem; margin-bottom: 0.5rem; font-size: 0.9375rem; font-weight: 600; color: #334155; }
+    .prose p  { margin-bottom: 0.75rem; color: #475569; line-height: 1.7; font-size: 0.9375rem; }
+    .prose ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; color: #475569; font-size: 0.9375rem; line-height: 1.7; }
+    .prose li { margin-bottom: 0.25rem; }
+    .prose a  { color: #7c3aed; text-decoration: underline; }
+    .prose strong { color: #1e293b; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #0f172a; }
+      .prose h2 { color: #f1f5f9; }
+      .prose h3 { color: #cbd5e1; }
+      .prose p, .prose ul { color: #94a3b8; }
+      .prose strong { color: #e2e8f0; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-slate-900 border-b border-slate-800">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-violet-500 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        </div>
+        <span class="text-white font-bold text-base">Formely<span class="text-violet-400">AI</span></span>
+      </a>
+      <span class="text-slate-600 mx-1">/</span>
+      <span class="text-slate-400 text-sm">Politique de confidentialité</span>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="max-w-3xl mx-auto px-6 py-12">
+
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-slate-900 mb-2">Politique de confidentialité</h1>
+      <p class="text-sm text-slate-400">Dernière mise à jour : 30 avril 2026</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 prose">
+
+      <p>
+        FormelyAI (<strong>« nous »</strong>, <strong>« notre »</strong>) s'engage à protéger les données personnelles
+        de ses utilisateurs. Cette politique explique quelles données nous collectons, pourquoi, et comment vous pouvez
+        exercer vos droits.
+      </p>
+
+      <!-- 1 -->
+      <h2>1. Responsable du traitement</h2>
+      <p>
+        FormelyAI, accessible à l'adresse <strong>formelyai.app</strong>.<br/>
+        Contact : <a href="mailto:support@formely-ai.com">support@formely-ai.com</a>
+      </p>
+
+      <!-- 2 -->
+      <h2>2. Données collectées</h2>
+
+      <h3>2.1 Données de compte</h3>
+      <ul>
+        <li><strong>Adresse email</strong> — lors de l'inscription par email ou via Google OAuth.</li>
+        <li><strong>Identifiant Google</strong> — uniquement si vous vous connectez via Google (nous ne stockons ni votre mot de passe Google ni votre photo de profil).</li>
+        <li><strong>Mot de passe</strong> — si inscription par email : stocké sous forme hachée (bcrypt), jamais en clair.</li>
+      </ul>
+
+      <h3>2.2 Contenu que vous soumettez</h3>
+      <ul>
+        <li><strong>Documents PDF et textes</strong> — vous soumettez du contenu pour générer des fiches. Ce contenu est transmis à l'API Anthropic (Claude) pour traitement, puis immédiatement supprimé de nos serveurs. <strong>Nous ne stockons pas vos fichiers PDF.</strong></li>
+        <li><strong>Fiches générées</strong> (questions, réponses, résumés) — stockées dans notre base de données afin de vous permettre de réviser.</li>
+        <li><strong>Matières</strong> et intitulés de sessions — pour organiser votre bibliothèque.</li>
+      </ul>
+
+      <h3>2.3 Données d'utilisation</h3>
+      <ul>
+        <li>Historique de révision (cartes vues, résultats, dates) — pour l'algorithme de répétition espacée.</li>
+        <li>Points d'expérience (XP), niveau et badges — pour la progression gamifiée.</li>
+        <li>Nombre de générations IA utilisées ce mois — pour gérer les quotas du plan gratuit.</li>
+      </ul>
+
+      <h3>2.4 Données de paiement</h3>
+      <p>
+        Les paiements sont gérés par <strong>Stripe</strong>. Nous ne stockons jamais de numéro de carte bancaire.
+        Nous conservons uniquement l'identifiant client Stripe et l'identifiant d'abonnement pour gérer votre plan Premium.
+      </p>
+
+      <!-- 3 -->
+      <h2>3. Finalités et bases légales</h2>
+      <ul>
+        <li><strong>Exécution du contrat</strong> — fournir le service (génération de fiches, révision, export).</li>
+        <li><strong>Intérêt légitime</strong> — améliorer le service, prévenir les abus, assurer la sécurité.</li>
+        <li><strong>Obligation légale</strong> — conservation des données de facturation (durée légale en vigueur).</li>
+      </ul>
+
+      <!-- 4 -->
+      <h2>4. Sous-traitants (tiers)</h2>
+      <ul>
+        <li><strong>Anthropic</strong> (anthropic.com) — traitement IA des documents soumis. Anthropic est soumis à sa propre politique de confidentialité ; les données ne sont pas utilisées pour entraîner des modèles sans consentement explicite.</li>
+        <li><strong>Stripe</strong> (stripe.com) — gestion des paiements et abonnements.</li>
+        <li><strong>Supabase / PostgreSQL</strong> — hébergement de la base de données (région Europe).</li>
+        <li><strong>Vercel</strong> (vercel.com) — hébergement de l'application (région Europe).</li>
+      </ul>
+
+      <!-- 5 -->
+      <h2>5. Durée de conservation</h2>
+      <ul>
+        <li>Données de compte et fiches : conservées tant que le compte est actif.</li>
+        <li>Données de paiement (identifiants Stripe) : conservées pendant la durée légale de conservation des pièces comptables (10 ans en France).</li>
+        <li>Après suppression du compte : toutes les données personnelles sont supprimées dans un délai de 30 jours.</li>
+      </ul>
+
+      <!-- 6 -->
+      <h2>6. Vos droits (RGPD)</h2>
+      <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :</p>
+      <ul>
+        <li><strong>Droit d'accès</strong> — obtenir une copie de vos données personnelles.</li>
+        <li><strong>Droit de rectification</strong> — corriger des données inexactes.</li>
+        <li><strong>Droit à l'effacement</strong> — demander la suppression de votre compte et de vos données.</li>
+        <li><strong>Droit à la portabilité</strong> — recevoir vos données dans un format structuré.</li>
+        <li><strong>Droit d'opposition</strong> — vous opposer à certains traitements fondés sur l'intérêt légitime.</li>
+      </ul>
+      <p>
+        Pour exercer ces droits, contactez-nous à <a href="mailto:support@formely-ai.com">support@formely-ai.com</a>.
+        Nous répondons dans un délai de 30 jours. Vous pouvez également introduire une réclamation auprès de la
+        <strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés) — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>.
+      </p>
+
+      <!-- 7 -->
+      <h2>7. Sécurité</h2>
+      <ul>
+        <li>Toutes les communications sont chiffrées en transit (HTTPS / TLS).</li>
+        <li>Les mots de passe sont hachés avec bcrypt (facteur de coût élevé).</li>
+        <li>L'accès à la base de données est restreint et authentifié.</li>
+      </ul>
+
+      <!-- 8 -->
+      <h2>8. Cookies et traceurs</h2>
+      <p>
+        FormelyAI utilise uniquement des cookies de session (authentification) et ne dépose aucun cookie publicitaire
+        ni tracker analytics tiers.
+      </p>
+
+      <!-- 9 -->
+      <h2>9. Modifications</h2>
+      <p>
+        Cette politique peut être mise à jour. Toute modification significative sera notifiée par email ou via une
+        bannière sur le site. La date de dernière mise à jour est indiquée en haut de cette page.
+      </p>
+
+      <!-- 10 -->
+      <h2>10. Contact</h2>
+      <p>
+        Pour toute question relative à cette politique ou à vos données :<br/>
+        <a href="mailto:support@formely-ai.com">support@formely-ai.com</a>
+      </p>
+
+    </div>
+
+    <div class="mt-8 text-center">
+      <a href="/" class="inline-flex items-center gap-2 text-violet-600 hover:text-violet-700 font-medium text-sm transition">
+        ← Retour à FormelyAI
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 bg-white mt-12 py-5 px-6">
+    <div class="max-w-3xl mx-auto text-center text-xs text-slate-400">
+      © 2026 FormelyAI · <a href="mailto:support@formely-ai.com" class="hover:text-violet-600 transition">support@formely-ai.com</a>
+    </div>
+  </footer>
+
+</body>
+</html>
