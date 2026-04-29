@@ -260,7 +260,7 @@ html.dark {
 }
 
 /* ── Landing: upload form appears above marketing content ── */
-#uploadSection {
+#uploadSection:not(.hidden) {
   display: flex;
   flex-direction: column;
 }

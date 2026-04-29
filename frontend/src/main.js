@@ -2587,7 +2587,8 @@ async function showAdmin() {
   document.getElementById("adminSection").classList.remove("hidden");
 
   try {
-    const data = await apiFetch("/admin/stats");
+    const res = await apiFetch("/admin/stats");
+    const data = await res.json();
     document.getElementById("adminTotalUsers").textContent    = data.total_users;
     document.getElementById("adminPremiumUsers").textContent  = data.premium_users;
     document.getElementById("adminFreeUsers").textContent     = data.free_users;
