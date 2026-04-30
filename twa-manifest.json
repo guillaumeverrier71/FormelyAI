@@ -32,5 +32,7 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
-  "fingerprints": []
+  "fingerprints": [
+    { "name": "my-key-alias", "value": "E3:66:EA:A6:77:01:81:BB:4F:DE:2F:24:38:FB:50:06:DC:71:9B:AD:D7:4F:93:83:06:1F:8C:6C:90:80:AA:26" }
+  ]
 }
