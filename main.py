@@ -507,6 +507,18 @@ async def index():
 async def privacy():
     return FileResponse("frontend/privacy.html")
 
+@app.get("/.well-known/assetlinks.json")
+async def assetlinks():
+    fingerprint = os.environ.get("ASSET_LINK_FINGERPRINT", "")
+    return JSONResponse([{
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "app.formelyai.twa",
+            "sha256_cert_fingerprints": [fingerprint] if fingerprint else []
+        }
+    }])
+
 
 @app.get("/auth/google-client-id")
 def google_client_id_endpoint():
